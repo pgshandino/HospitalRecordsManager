@@ -11,6 +11,8 @@ else:
     from tkinter.scrolledtext import ScrolledText
     import tkinter.messagebox as messagebox
 
+
+
 LARGE_FONT = ("Matura MT Script Capitals", 18, 'bold')
 small_font = ("Lucida Calligraphy", 14)
 
@@ -18,9 +20,10 @@ small_font = ("Lucida Calligraphy", 14)
 def Quit():
     # print ('Hello, getting out of here')
     option = messagebox.askyesno('Quit', 'Are you sure you want to exit?')
-    if option:
+    if option == True:
         import sys
         sys.exit()
+
 
 
 class Database:
@@ -28,37 +31,30 @@ class Database:
     def __init__(self):
         self.connection = sql.connect('database.db')
         self.cursor = self.connection.cursor()
-        self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS Records (firstName TEXT, lastName TEXT, age TEXT, gender TEXT, date TEXT, hospitalID TEXT, scanID TEXT, scanType TEXT, indication TEXT, findings TEXT, conclusion TEXT, doctors TEXT)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS Records (firstName TEXT, lastName TEXT, age TEXT, gender TEXT, date TEXT, hospitalID TEXT, scanID TEXT, scanType TEXT, indication TEXT, findings TEXT, conclusion TEXT, doctors TEXT)")
+
 
     def __del__(self):
         self.cursor.close()
         self.connection.close()
 
-    def insert(self, firstName, lastName, age, gender, date, hospitalID, scanID, scanType, indication, findings,
-               conclusion, doctors):
-        self.cursor.execute("INSERT INTO Records VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (
-            firstName, lastName, age, gender, date, hospitalID, scanID, scanType, indication, findings, conclusion,
-            doctors))
+    def insert(self, firstName, lastName, age, gender, date, hospitalID, scanID, scanType, indication, findings, conclusion, doctors):
+        self.cursor.execute("INSERT INTO Records VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (firstName, lastName, age, gender, date, hospitalID, scanID, scanType, indication, findings, conclusion, doctors))
         self.connection.commit()
-
-    def update(self, firstName, lastName, age, gender, date, hospitalID, scanID, scanType, indication, findings,
-               conclusion, doctors):
-        self.cursor.execute(
-            "UPDATE Records SET firstName = ?, lastName = ?, age = ?, gender = ?, date = ?, scanID = ?, scanType = ?, "
-            "indication = ?, findings = ?, conclusion = ?, doctors = ? WHERE hospitalID = ?",
-            (firstName, lastName, age, gender, date, scanID, scanType, indication, findings, conclusion, doctors,
-             hospitalID))
+    def update(self, firstName, lastName, age, gender, date, hospitalID, scanID, scanType, indication, findings, conclusion, doctors):
+        self.cursor.execute("UPDATE Records SET firstName = ?, lastName = ?, age = ?, gender = ?, date = ?, scanID = ?, scanType = ?, indication = ?, findings = ?, conclusion = ?, doctors = ? WHERE hospitalID = ?", (firstName, lastName, age, gender, date, scanID, scanType, indication, findings, conclusion, doctors, hospitalID))
         self.connection.commit()
-
     def search(self, filter):
-        self.cursor.execute("SELECT * FROM Records WHERE hospitalID = ?", (filter,))
+        self.cursor.execute("SELECT * FROM Records WHERE hospitalID = ?", (filter, ))
         search_results = self.cursor.fetchall()
         return search_results
         # self.connection.commit()
 
+
+
+
     def delete(self, id):
-        self.cursor.execute("DELETE FROM Records WHERE hospitalID = ?", (id,))
+        self.cursor.execute("DELETE FROM Records WHERE hospitalID = ?", (id, ))
         self.connection.commit()
 
     def display(self):
@@ -67,32 +63,34 @@ class Database:
         return records
 
 
-class Values:
-    def validate(self, first_name_entry, last_name_entry, age_entry, gender_entry, date_entry, hospital_id_entry,
-                 scan_id_entry, scan_type_entry, conclusion_entry, doctors_entry):
 
-        if not (isinstance(first_name_entry, str) and first_name_entry != ''):
+class Values:
+    def validate(self, first_name_entry, last_name_entry, age_entry, gender_entry, date_entry, hospital_id_entry, scan_id_entry, scan_type_entry, conclusion_entry, doctors_entry):
+
+        if not (isinstance(first_name_entry, str) and first_name_entry!=''):
             return 'first name'
-        elif not (isinstance(last_name_entry, str) and last_name_entry != ''):
+        elif not (isinstance(last_name_entry, str) and last_name_entry!=''):
             return 'last name'
-        elif not (age_entry.isdigit() and age_entry != ''):
+        elif not (age_entry.isdigit() and age_entry!=''):
             return 'age'
-        elif not (isinstance(gender_entry, str) and gender_entry != ''):
+        elif not (isinstance(gender_entry, str) and gender_entry!=''):
             return 'gender'
-        elif not (isinstance(date_entry, str) and date_entry != ''):
+        elif not (isinstance(date_entry, str) and date_entry!=''):
             return 'date'
-        elif not (hospital_id_entry.isdigit() and len(hospital_id_entry) == 6):
+        elif not (hospital_id_entry.isdigit() and len(hospital_id_entry)==6):
             return 'hospital id'
-        elif not (scan_id_entry.isdigit() and len(scan_id_entry) == 4):
+        elif not (scan_id_entry.isdigit() and len(scan_id_entry)==4):
             return 'scan id'
-        elif not (isinstance(scan_type_entry, str) and scan_type_entry != ''):
+        elif not (isinstance(scan_type_entry, str) and scan_type_entry!=''):
             return 'scan type'
-        elif not (isinstance(conclusion_entry, str) and conclusion_entry != ''):
+        elif not (isinstance(conclusion_entry, str) and conclusion_entry!=''):
             return 'conclusion'
-        elif not (isinstance(doctors_entry, str) and doctors_entry != ''):
+        elif not (isinstance(doctors_entry, str) and doctors_entry!=''):
             return 'doctors'
         else:
             return 'OK'
+
+
 
 
 class HospitalRecordManagement(tk.Tk):
@@ -126,7 +124,6 @@ class HospitalRecordManagement(tk.Tk):
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
-
 
 class Main(tk.Frame):
 
@@ -163,12 +160,15 @@ class Main(tk.Frame):
 
 class Add(tk.Frame):
 
+
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.database = Database()
         self.scan_list = ['Abdominal', 'Abdomino-pelvic', 'Doppler', 'Occular', 'Obstretrics', 'Thyroid', 'TVS']
         self.doctorsList = ['Alabi', 'Atim', 'Anako', 'Momodu', 'Simon', 'Shalangwa']
         self.genderList = ['Male', 'Female']
+
 
         self.first = tk.StringVar()
         self.last = tk.StringVar()
@@ -182,6 +182,8 @@ class Add(tk.Frame):
         self.v_findings = tk.StringVar()
         self.v_conclusion = tk.StringVar()
         self.v_docs = tk.StringVar()
+
+
 
         self.header = tk.Frame(self, bd=5)
         self.header.pack(side='top', expand=True, anchor='n')
@@ -274,10 +276,12 @@ class Add(tk.Frame):
         self.indication_entry = tk.Entry(self.indication_frame, textvariable=self.v_indication)
         self.indication_entry.grid(row=1, column=1, padx=10, pady=5, sticky='w')
 
+
         self.findings = tk.Label(self.findings_frame, text='Findings')
         self.findings.pack(anchor='w', padx=10)
         self.findings_entry = ScrolledText(self.findings_frame, wrap='word')
         self.findings_entry.pack(fill='x', padx=10, pady=5)
+
 
         self.conclusion = tk.Label(self.conclusion_frame, text='Conclusion')
         self.conclusion.grid(row=9, column=0, padx=10, pady=5, sticky='w')
@@ -294,22 +298,23 @@ class Add(tk.Frame):
         self.submit = tk.Button(self.submit_frame, text='Submit', font=small_font, command=self.Submit)
         self.submit.pack(side='bottom', fill='x')
 
+
     def Submit(self):
 
-        self.values = Values()
-        self.test = self.values.validate(self.first_name_entry.get(), self.last_name_entry.get(), self.age_entry.get(),
-                                         self.gender_entry.get(), self.date_entry.get(), self.hospital_id_entry.get(),
-                                         self.scan_id_entry.get(), self.scan_type_entry.get(),
-                                         self.conclusion_entry.get(), self.doctors_entry.get())
 
-        if self.test == 'OK':
+
+
+
+
+
+        self.values = Values()
+        self.test = self.values.validate(self.first_name_entry.get(), self.last_name_entry.get(), self.age_entry.get(), self.gender_entry.get(), self.date_entry.get(), self.hospital_id_entry.get(), self.scan_id_entry.get(), self.scan_type_entry.get(), self.conclusion_entry.get(), self.doctors_entry.get())
+
+        if (self.test == 'OK'):
+
 
             try:
-                self.database.insert(self.first_name_entry.get(), self.last_name_entry.get(), self.age_entry.get(),
-                                     self.gender_entry.get(), self.date_entry.get(), self.hospital_id_entry.get(),
-                                     self.scan_id_entry.get(), self.scan_type_entry.get(), self.indication_entry.get(),
-                                     self.findings_entry.get("1.0", tk.END), self.conclusion_entry.get(),
-                                     self.doctors_entry.get())
+                self.database.insert(self.first_name_entry.get(), self.last_name_entry.get(), self.age_entry.get(), self.gender_entry.get(), self.date_entry.get(), self.hospital_id_entry.get(), self.scan_id_entry.get(), self.scan_type_entry.get(), self.indication_entry.get(), self.findings_entry.get("1.0", tk.END), self.conclusion_entry.get(), self.doctors_entry.get())
 
 
 
@@ -384,15 +389,17 @@ class Delete(tk.Frame):
         self.search_entry = tk.Entry(self.body, textvariable=self.name)
         self.search_entry.grid(row=1, column=1, padx=100, pady=100, sticky='w', ipady=10)
 
+
         self.search = tk.Button(self.body, text='Delete', font=small_font, command=self.delete_file)
         self.search.grid(row=2, columnspan=4, ipady=10)
 
-        self.database = Database()
 
+
+        self.database = Database()
     def delete_file(self):
         self.val = self.search_entry.get()
         option = messagebox.askyesno('Delete', 'Are you sure you want to delete thus record?')
-        if option:
+        if option == True:
             try:
                 self.database.delete(self.val)
                 messagebox.showinfo('Success', 'Record deleted')
@@ -402,9 +409,12 @@ class Delete(tk.Frame):
         else:
             pass
 
+
     def Search(self):
         self.database = Database()
         self.data = self.database.search(self.search_entry.get())
+
+
 
 
 class Search(tk.Frame):
@@ -464,15 +474,20 @@ class Search(tk.Frame):
 
     def Search(self):
 
+
+
+
         self.data = self.database.search(self.search_entry.get())
-        if not self.data:
+        if self.data == []:
             messagebox.showerror('Not Found', 'This record is not found!')
         else:
             ask = messagebox.askokcancel(self.data[0][:2], 'View record')
-            if ask:
+            if ask == True:
                 self.popup(self.data)
             else:
                 pass
+
+
 
     def popup(self, vals):
         win = tk.Toplevel()
@@ -484,8 +499,8 @@ class Search(tk.Frame):
 
         self.first = tk.StringVar()
         self.last = tk.StringVar()
-        self.v_age = tk.StringVar()
-        self.v_gender = tk.StringVar()
+        self. v_age = tk.StringVar()
+        self. v_gender = tk.StringVar()
         self.v_date = tk.StringVar()
         self.v_hos_id = tk.StringVar()
         self.v_scan_id = tk.StringVar()
@@ -494,6 +509,7 @@ class Search(tk.Frame):
         self.v_findings = tk.StringVar()
         self.v_conclusion = tk.StringVar()
         self.v_docs = tk.StringVar()
+
 
         body = tk.Frame(win)
         body.pack(fill='both', expand=True, anchor='n')
@@ -585,6 +601,7 @@ class Search(tk.Frame):
         submit = tk.Button(submit_frame, text='Submit', font=small_font, command=self.Update)
         submit.pack(side='bottom', fill='x')
 
+
         self.first.set(vals[0][0])
         self.last.set(vals[0][1])
         self.v_age.set(vals[0][2])
@@ -598,23 +615,22 @@ class Search(tk.Frame):
         self.v_conclusion.set(vals[0][10])
         self.v_docs.set(vals[0][11])
 
+
+
+
     def Update(self):
 
+
+
         self.values = Values()
-        self.test = self.values.validate(self.first.get(), self.last.get(), self.v_age.get(), self.v_gender.get(),
-                                         self.v_date.get(), self.v_hos_id.get(), self.v_scan_id.get(),
-                                         self.v_scan_type.get(), self.v_conclusion.get(), self.v_docs.get())
+        self.test = self.values.validate(self.first.get(), self.last.get(), self.v_age.get(), self.v_gender.get(), self.v_date.get(), self.v_hos_id.get(), self.v_scan_id.get(), self.v_scan_type.get(), self.v_conclusion.get(), self.v_docs.get())
 
         if (self.test == 'OK'):
 
+
             try:
-                # print(self.first.get(), self.last.get(), self.v_age.get(), self.v_gender.get(), self.v_date.get(),
-                # self.v_hos_id.get(), self.v_scan_id.get(), self.v_scan_type.get(), self.v_indication.get(),
-                # self.findings_entry.get('1.0', tk.END), self.v_conclusion.get(), self.v_docs.get())
-                self.database.update(self.first.get(), self.last.get(), self.v_age.get(), self.v_gender.get(),
-                                     self.v_date.get(), self.v_hos_id.get(), self.v_scan_id.get(),
-                                     self.v_scan_type.get(), self.v_indication.get(),
-                                     self.findings_entry.get('1.0', tk.END), self.v_conclusion.get(), self.v_docs.get())
+                # print(self.first.get(), self.last.get(), self.v_age.get(), self.v_gender.get(), self.v_date.get(), self.v_hos_id.get(), self.v_scan_id.get(), self.v_scan_type.get(), self.v_indication.get(), self.findings_entry.get('1.0', tk.END), self.v_conclusion.get(), self.v_docs.get())
+                self.database.update(self.first.get(), self.last.get(), self.v_age.get(), self.v_gender.get(), self.v_date.get(), self.v_hos_id.get(), self.v_scan_id.get(), self.v_scan_type.get(), self.v_indication.get(), self.findings_entry.get('1.0', tk.END), self.v_conclusion.get(), self.v_docs.get())
 
 
 
@@ -637,6 +653,7 @@ class Display(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+
 
         self.database = Database()
         self.data = self.database.display()
@@ -665,14 +682,17 @@ class Display(tk.Frame):
         self.body = tk.Frame(self)
         self.body.pack(side='top', fill='both', expand=True, anchor='n')
 
+
         tk.Label(self.body, text="Record List").pack(side='top')
+
+
 
         self.display = ttk.Treeview(self.body)
         self.display.pack(fill='both')
 
+
         self.display['show'] = 'headings'
-        self.display['columns'] = (
-            'first_name', 'last_name', 'age', 'gender', 'date', 'hospital_id', 'scan_id', 'doctors')
+        self.display['columns'] = ('first_name', 'last_name', 'age', 'gender', 'date', 'hospital_id', 'scan_id', 'doctors')
 
         self.display.heading('first_name', text='First Name')
         self.display.heading('last_name', text='Last Name')
@@ -683,6 +703,7 @@ class Display(tk.Frame):
         self.display.heading('scan_id', text='Scan ID')
         self.display.heading('doctors', text='Doctors')
 
+
         self.display.column('age', width=100, stretch=tk.NO)
         self.display.column('gender', width=100, stretch=tk.NO)
         self.display.column('date', width=100, stretch=tk.NO)
@@ -691,7 +712,8 @@ class Display(tk.Frame):
 
         for d in self.data:
             display_data = d[:7] + tuple([d[-1]])
-            self.display.insert('', 'end', values=display_data)
+            self.display.insert('', 'end', values=(display_data))
+
 
 
 app = HospitalRecordManagement()
